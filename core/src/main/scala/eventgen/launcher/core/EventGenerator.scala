@@ -36,7 +36,7 @@ sealed class AvroEventGenerator(val schema: Schema) extends EventGenerator[ByteA
     writer.setSchema(schema)
     val outputStream = new ByteArrayOutputStream
     val encoder = EncoderFactory.get().jsonEncoder(schema, outputStream, true)
-    getRandomStream(schema, context).take(context.count).toList.foreach(n => writer.write(n.dataRecord, encoder))
+    getRandomStream(context).take(context.count).toList.foreach(n => writer.write(n.dataRecord, encoder))
     encoder.flush()
     \/-(outputStream)
   }
@@ -55,9 +55,9 @@ sealed class AvroEventGenerator(val schema: Schema) extends EventGenerator[ByteA
     }
   }
 
-  def getRandomStream(schema: Schema, context: ExecutionContext): fs2.Stream[Pure, DataNode] = {
+  def getRandomStream(context: ExecutionContext): fs2.Stream[Pure, DataNode] = {
     generateRandomNode(schema, context) match {
-      case \/-(node) => fs2.Stream.emit[Pure, DataNode](node) ++ getRandomStream(schema, context)
+      case \/-(node) => fs2.Stream.emit[Pure, DataNode](node) ++ getRandomStream(context)
       case -\/(error) => fs2.Stream.fail(new Exception(error))
     }
   }
