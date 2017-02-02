@@ -6,7 +6,7 @@ object dependencies {
   def _provided (module: ModuleID): ModuleID = module % "provided"
 
   object versions {
-    val scalaz     = "7.1.*"
+    val scalaz     = "7.1.11"
     val stream     = "0.8.4"
     val scalatest  = "2.2.6"
     val shapeless  = "2.3.2"
@@ -16,6 +16,7 @@ object dependencies {
     val journal    = "2.3.16"
     val knobs      = "3.12.+"
     val commons    = "3.5"
+    val avro       = "1.8.1"
   }
 
   object journal {
@@ -36,7 +37,12 @@ object dependencies {
 
   object scalaz {
     val core    = "org.scalaz"        %% "scalaz-core"   % versions.scalaz
+    val effect  = "org.scalaz"        %% "scalaz-effect" % versions.scalaz
     val streams = "org.scalaz.stream" %% "scalaz-stream" % versions.stream
+  }
+
+  object avro {
+    val core    = "org.apache.avro" % "avro" % versions.avro
   }
 
   object shapeless {

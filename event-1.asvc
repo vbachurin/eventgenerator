@@ -1,0 +1,21 @@
+{
+  "type": "record",
+  "name": "EmployeeCreated",
+  "doc": "describes a scenario when an employee has been successfully created ",
+  "fields": [
+    { "name": "name", "type": "string", "doc": "employee name", "generator": "EmployeeNameGenerator" },
+    { "name": "newcomerBonus", "type": ["null","double"], "doc": "describes a bonus that newcomer may get", "generator": "Range[Double](from = 0, to = 2000)"},
+    { "name": "baseSalary", "type": "double", "doc": "the base salary of the employee", "generator": "Range[Double](from = 75000, to = 120000)" },
+    {
+	  "name": "nestedField",
+	  "doc": "nested field",
+	  "type": {
+	    "type": "record",
+		"name": "nestedSchema",
+        "fields": [
+          { "name": "name", "type": "string", "doc": "the nested salary", "generator": "EmployeeNameGenerator" }
+        ]
+	  }
+	}
+  ]
+}
