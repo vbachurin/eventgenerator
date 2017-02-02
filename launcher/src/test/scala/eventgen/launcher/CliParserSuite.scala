@@ -31,4 +31,15 @@ class CliParserSuite extends FunSuite {
     assertResult(Failure(NonEmptyList("--count is mandatory parameter", "Cannot convert invalidValue")))(result)
   }
 
+  test("should return unparsed parameters on getOptions") {
+    // arrange
+    val inputArgs = "invalid token".split(" ").toList
+
+    // act
+    val result = CliParser.getOptions(inputArgs)
+
+    // assert
+    assertResult(Failure(NonEmptyList("Invalid parameter \"invalid token\"")))(result)
+  }
+
 }

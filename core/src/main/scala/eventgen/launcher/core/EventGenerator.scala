@@ -23,29 +23,22 @@ trait EventGenerator[Output] {
 
 object EventGenerator {
   def forAvroSchema(schemaText: String): String \/ AvroEventGenerator = {
-    if (schemaText == null || schemaText.length == 0) {
-      -\/("a")
-    }
-    else {
-      \/-(new AvroEventGenerator(schemaText))
-    }
+    for {
+      validStr <- schemaText.ifNotEmpty
+      parsed <- validStr.parseRight
+    } yield new AvroEventGenerator(parsed)
   }
 }
 
-sealed class AvroEventGenerator(schemaText: String) extends EventGenerator[ByteArrayOutputStream] {
+sealed class AvroEventGenerator(val schema: Schema) extends EventGenerator[ByteArrayOutputStream] {
   override def generate(context: ExecutionContext): String \/ ByteArrayOutputStream = {
-    for {
-      schema <- schemaText.parseRight
-      output <- {
-        val writer = new GenericDatumWriter[GenericRecord]
-        writer.setSchema(schema)
-        val outputStream = new ByteArrayOutputStream
-        val encoder = EncoderFactory.get().jsonEncoder(schema, outputStream, true)
-        getRandomStream(schema, context).take(context.count).toList.foreach(n => writer.write(n.dataRecord, encoder))
-        encoder.flush()
-        \/-(outputStream)
-      }
-    } yield output
+    val writer = new GenericDatumWriter[GenericRecord]
+    writer.setSchema(schema)
+    val outputStream = new ByteArrayOutputStream
+    val encoder = EncoderFactory.get().jsonEncoder(schema, outputStream, true)
+    getRandomStream(schema, context).take(context.count).toList.foreach(n => writer.write(n.dataRecord, encoder))
+    encoder.flush()
+    \/-(outputStream)
   }
 
   def generateField(generatorDescription: String, context: ExecutionContext): String \/ Any = {

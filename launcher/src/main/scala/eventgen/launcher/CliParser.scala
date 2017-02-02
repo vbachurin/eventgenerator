@@ -47,7 +47,7 @@ object CliParser {
 
     nextOption(Map(), args) match {
       case \/-(options) => getRunInfo(options)
-      case -\/(error) => Failure(s"Invalid parameter $error").toValidationNel
+      case -\/(error) => Failure(s"""Invalid parameter "$error"""").toValidationNel
     }
   }
 

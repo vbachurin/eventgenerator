@@ -11,12 +11,21 @@ import scalaz._
   */
 object Extensions {
   implicit class StringExtension(s: String) {
-    def parseRight(): String \/ Schema = {
+    def parseRight: String \/ Schema = {
       try {
         val parser = new Parser
         \/-(parser.parse(s))
       } catch {
-        case NonFatal(exc) => -\/(exc.toString)
+        case NonFatal(exc) => -\/(exc.getMessage)
+      }
+    }
+
+    def ifNotEmpty: String \/ String = {
+      if (s.isEmpty) {
+        -\/("Schema is empty")
+      }
+      else {
+        \/-(s)
       }
     }
   }
