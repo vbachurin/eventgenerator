@@ -10,7 +10,7 @@ import scalaz.effect.IO
 
 trait PluginSource {
 
-  def plugins: IO[List[ExternalGenerator[_]]]
+  def plugins: IO[List[ExternalGenerator]]
 
 }
 
@@ -18,7 +18,7 @@ object PluginSource {
 
   def getFromFile(path: String): PluginSource = new PluginSource {
 
-    def plugins: IO[List[ExternalGenerator[_]]] = IO(Nil)
+    def plugins: IO[List[ExternalGenerator]] = IO(Nil)
 
   }
 

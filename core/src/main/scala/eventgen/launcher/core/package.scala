@@ -1,4 +1,4 @@
-package eventgen.launcher.core
+package eventgen.launcher
 
 import org.apache.avro.Schema
 import org.apache.avro.Schema.Parser
@@ -7,9 +7,12 @@ import scala.util.control.NonFatal
 import scalaz._
 
 /**
-  * Created by Andrew on 31.01.2017.
+  * Created by Andrew on 08.02.2017.
   */
-object Extensions {
+package object core {
+
+  type RandomReader[T] = Kleisli[Id.Id, RandomState, T]
+
   implicit class StringExtension(s: String) {
     def parseRight: String \/ Schema = {
       try {
@@ -37,4 +40,5 @@ object Extensions {
       case _: java.lang.NumberFormatException => None
     }
   }
+
 }
