@@ -5,24 +5,24 @@ import scala.util.Random
 /**
   * Created by Andrew on 09.02.2017.
   */
-case class RandomState(mutableRandom: Random) {
-  def nextInt: (RandomState, Int) = {
+case class ImmutableRandom(mutableRandom: Random) {
+  def nextInt: (ImmutableRandom, Int) = {
     val i = mutableRandom.nextInt
-    (RandomState(mutableRandom), i)
+    (ImmutableRandom(mutableRandom), i)
   }
 
-  def nextDouble: (RandomState, Double) = {
+  def nextDouble: (ImmutableRandom, Double) = {
     val d = mutableRandom.nextDouble
-    (RandomState(mutableRandom), d)
+    (ImmutableRandom(mutableRandom), d)
   }
 
   def nextLong = {
     val l = mutableRandom.nextLong
-    (RandomState(mutableRandom), l)
+    (ImmutableRandom(mutableRandom), l)
   }
 
   def nextBoolean = {
     val b = mutableRandom.nextBoolean
-    (RandomState(mutableRandom), b)
+    (ImmutableRandom(mutableRandom), b)
   }
 }

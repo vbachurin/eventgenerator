@@ -1,34 +1,36 @@
 package eventgen.launcher.core
 
-import scalaz.{Reader, State}
+import scalaz.std.int
+import scalaz._
 
 /**
   * Created by Andrew on 18.01.2017.
   */
 
-object GenerationImplicits {
-  implicit val intGen = State[RandomState, Int](state => state.nextInt)
-
-  implicit val doubleGen = State[RandomState, Double](state => state.nextDouble)
-
-  implicit val longGen = State[RandomState, Long](state => state.nextLong)
-
-  implicit val boolGen = State[RandomState, Boolean](state => state.nextBoolean)
-}
 
 object PrimitiveGenerators {
 
-  import GenerationImplicits._
+  trait RangeGenerator[T] {
+    def generate(from: Int, to: Int): State[ImmutableRandom, T]
+  }
 
-  class IntRangeGenerator(from: Int, to: Int)(implicit generator: State[RandomState, Int]) extends Generator[Int] {
-    override def get: State[RandomState, Int] = generator.map(value => {
+  val intGen = State[ImmutableRandom, Int](state => state.nextInt)
+
+  val doubleGen = State[ImmutableRandom, Double](state => state.nextDouble)
+
+  val longGen = State[ImmutableRandom, Long](state => state.nextLong)
+
+  val boolGen = State[ImmutableRandom, Boolean](state => state.nextBoolean)
+
+  implicit val intRangeGenerator = new RangeGenerator[Int] {
+    override def generate(from: Int, to: Int): State[ImmutableRandom, Int] = intGen.map(value => {
       val h = to - from
-      from + value * h
+      from + value % h
     })
   }
 
-  class DoubleRangeGenerator(from: Int, to: Int)(implicit generator: State[RandomState, Double]) extends Generator[Double] {
-    override def get: State[RandomState, Double] = generator.map(value => {
+  implicit val doubleRangeGenerator = new RangeGenerator[Double] {
+    override def generate(from: Int, to: Int): State[ImmutableRandom, Double] = doubleGen.map(value => {
       val h = to - from
       from + value * h
     })

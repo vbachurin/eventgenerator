@@ -1,6 +1,6 @@
 package eventgen.launcher
 
-import eventgen.launcher.core.{EventGenerator, ExecutionContext}
+import eventgen.launcher.core.ExecutionContext
 
 import scalaz.effect.{IO, SafeApp}
 
@@ -20,10 +20,12 @@ object Main extends SafeApp {
         schemaFileContent <- IO(scala.io.Source.fromFile(runContext.schemaPath).mkString)
         externalGenerators <- PluginSource.getFromFile(runContext.generatorsPath.get).plugins
         _ <- IO {
-          for {
-            generator <- EventGenerator.forAvroSchema(schemaFileContent)
-            outputStream <- generator.generate(ExecutionContext.get(runContext.count, externalGenerators))
-          } println(outputStream)
+          ()
+//          for {
+//
+//            generator <- EventGenerator.forAvroSchema(schemaFileContent)
+//            outputStream <- generator.generate(ExecutionContext.get(runContext.count, externalGenerators))
+//          } println(outputStream)
           /*if (runContext.outputType == StdOut) { */
         }
       } yield ()

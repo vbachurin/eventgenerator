@@ -5,7 +5,7 @@ package eventgen.launcher.core
   */
 trait ExecutionContext {
 
-  val generators: Map[String, ExternalGenerator]
+  val generators: Map[String, ExternalGenerator[_]]
 
   val count: Int
 
@@ -13,8 +13,8 @@ trait ExecutionContext {
 
 object ExecutionContext {
 
-  def get(c: Int, gens: List[ExternalGenerator]) = new ExecutionContext {
-    val generators: Map[String, ExternalGenerator] = gens.map(g => (g.name -> g)).toMap
+  def get(c: Int, gens: List[ExternalGenerator[_]]) = new ExecutionContext {
+    val generators: Map[String, ExternalGenerator[_]] = gens.map(g => (g.name -> g)).toMap
     val count: Int = c
   }
 

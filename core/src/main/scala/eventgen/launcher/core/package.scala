@@ -11,8 +11,6 @@ import scalaz._
   */
 package object core {
 
-  type RandomReader[T] = Kleisli[Id.Id, RandomState, T]
-
   implicit class StringExtension(s: String) {
     def parseRight: String \/ Schema = {
       try {
