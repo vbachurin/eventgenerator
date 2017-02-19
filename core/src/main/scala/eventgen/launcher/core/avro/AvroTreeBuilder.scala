@@ -8,13 +8,12 @@ import org.apache.avro.Schema.{Field, Type}
 import scala.collection.JavaConversions._
 import scalaz._
 import Scalaz._
-import StateExtensions._
 import org.apache.avro.generic.GenericData
 
 /**
   * Created by Andrew on 09.02.2017.
   */
-class AvroTreeBuilder(context: ExecutionContext) extends TreeBuilder[Schema] {
+class AvroTreeBuilder extends TreeBuilder[Schema, AvroNode[_]] {
 
   def getCustomFieldState(schema: Schema, extGenerator: ExternalGenerator[_]): State[ImmutableRandom, _] = extGenerator.get
 
@@ -22,7 +21,7 @@ class AvroTreeBuilder(context: ExecutionContext) extends TreeBuilder[Schema] {
     rangeGen.generate(from, to).map(AvroField[T](_))
   }
 
-  def getFieldState(f: Field): String \/ State[ImmutableRandom, AvroNode[_]] = {
+  def getFieldState(f: Field, context: ExecutionContext): String \/ State[ImmutableRandom, AvroNode[_]] = {
     val RangePattern = "Range\\[(Double|Int)\\]\\(from = ([-0-9]+), to = ([-0-9]+)\\)".r
     f.getProp("generator") match {
       case RangePattern(typeParam, Int(from), Int(to)) => typeParam match {
@@ -36,13 +35,13 @@ class AvroTreeBuilder(context: ExecutionContext) extends TreeBuilder[Schema] {
     }
   }
 
-  override def buildTree(rootSchema: Schema): String \/ State[ImmutableRandom, AvroNode[_]] = {
+  override def buildTree(rootSchema: Schema, executionContext: ExecutionContext): String \/ State[ImmutableRandom, AvroNode[_]] = {
     val fields = rootSchema.getFields.toList
     val fieldStates = fields.map(f => {
       if (f.schema().getType == Type.RECORD)
-        buildTree(f.schema()).map((f.name(), _))
+        buildTree(f.schema(), executionContext).map((f.name(), _))
       else
-        getFieldState(f).map((f.name(), _))
+        getFieldState(f, executionContext).map((f.name(), _))
     })
 
     for (childrenMap <- fieldStates.sequenceU) yield generateNodeState(rootSchema, childrenMap.toMap)

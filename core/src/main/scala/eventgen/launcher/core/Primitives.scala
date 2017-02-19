@@ -7,20 +7,31 @@ import scalaz._
   * Created by Andrew on 18.01.2017.
   */
 
+trait RangeGenerator[T] {
+  def generate(from: Int, to: Int): State[ImmutableRandom, T]
+}
 
 object PrimitiveGenerators {
 
-  trait RangeGenerator[T] {
-    def generate(from: Int, to: Int): State[ImmutableRandom, T]
-  }
+  val intGen = State[ImmutableRandom, Int](state => {
+    val i = state.mutableRandom.nextInt
+    (ImmutableRandom(state.mutableRandom), i)
+  })
 
-  val intGen = State[ImmutableRandom, Int](state => state.nextInt)
+  val doubleGen = State[ImmutableRandom, Double](state => {
+    val d = state.mutableRandom.nextDouble
+    (ImmutableRandom(state.mutableRandom), d)
+  })
 
-  val doubleGen = State[ImmutableRandom, Double](state => state.nextDouble)
+  val longGen = State[ImmutableRandom, Long](state => {
+    val l = state.mutableRandom.nextLong
+    (ImmutableRandom(state.mutableRandom), l)
+  })
 
-  val longGen = State[ImmutableRandom, Long](state => state.nextLong)
-
-  val boolGen = State[ImmutableRandom, Boolean](state => state.nextBoolean)
+  val boolGen = State[ImmutableRandom, Boolean](state => {
+    val b = state.mutableRandom.nextBoolean
+    (ImmutableRandom(state.mutableRandom), b)
+  })
 
   implicit val intRangeGenerator = new RangeGenerator[Int] {
     override def generate(from: Int, to: Int): State[ImmutableRandom, Int] = intGen.map(value => {

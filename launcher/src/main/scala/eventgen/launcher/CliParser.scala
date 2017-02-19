@@ -1,5 +1,7 @@
 package eventgen.launcher
 
+import java.io.File
+
 import scalaz._
 import scalaz.Scalaz._
 import scalaz.effect.IO
@@ -12,9 +14,9 @@ object CliParser {
 
   type OptionMap = Map[Symbol, String]
 
-  def getOutputType(outputTypeStr: String): String \/ OutputType = outputTypeStr match {
+  def getOutputType(outputTypeStr: String, output: Option[String]): String \/ OutputType = outputTypeStr match {
     case "stdout" => \/-(StdOut)
-    case "file" => \/-(File)
+    case "file" => \/-(FileOutput(new File(output.get)))
     case str => -\/(s"Cannot convert $str")
   }
 
@@ -31,8 +33,9 @@ object CliParser {
     val count = mapParseIntNel(countStr)
     val generatorsPath = map.get('generatorsPath)
     val schemaPath = map.get('schemaPath).toSuccessNel("--schema is mandatory parameter")
-    val outputType = map.get('outputType).toRightDisjunction("--output is mandatory parameter").flatMap(x => getOutputType(x)).validation.toValidationNel
-    (count ⊛ schemaPath ⊛ outputType) (RunContext(_, generatorsPath, _, _))
+    val outputPath = map.get('outputPath)
+    val outputType = map.get('outputType).toRightDisjunction("--output is mandatory parameter").flatMap(x => getOutputType(x, outputPath)).validation.toValidationNel
+    (count |@| schemaPath |@| outputType) (RunContext(_, generatorsPath, _, _, outputPath))
   }
 
   def getOptions(args: List[String]): ValidationNel[String, RunContext] = {
@@ -42,6 +45,7 @@ object CliParser {
       case "--include" :: generatorsPath :: tail => nextOption(map + ('generatorsPath -> generatorsPath), tail)
       case "--output" :: outputType :: tail => nextOption(map + ('outputType -> outputType), tail)
       case "--schema" :: schemaPath :: tail => nextOption(map + ('schemaPath -> schemaPath), tail)
+      case "--output-path" :: outputPath :: tail => nextOption(map + ('outputPath -> outputPath), tail)
       case _@invalid => -\/(invalid.mkString(" "))
     }
 

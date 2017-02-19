@@ -17,7 +17,7 @@ class CliParserSuite extends FunSuite {
     val result = CliParser.getOptions(inputArgs)
 
     // assert
-    assertResult(Success(RunContext(5000, Some("~/generators"), "~/schema/event-1.asvc", StdOut)))(result)
+    assertResult(Success(RunContext(5000, Some("~/generators"), "~/schema/event-1.asvc", StdOut, None)))(result)
   }
 
   test("should return all parameters failures on getOptions") {

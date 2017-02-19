@@ -6,5 +6,5 @@ import scalaz.\/
   * Created by Andrew on 09.02.2017.
   */
 trait SchemaParser[S] {
-  def parse(text: String): String \/ S
+  def parse(schema: String): String \/ S
 }
