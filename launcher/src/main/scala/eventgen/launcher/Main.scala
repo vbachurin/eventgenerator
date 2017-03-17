@@ -2,6 +2,7 @@ package eventgen.launcher
 
 import java.io.{File, FileOutputStream}
 
+import com.typesafe.config.ConfigFactory
 import eventgen.launcher.core._
 import eventgen.launcher.ClassLoaderImplicits._
 
@@ -34,15 +35,34 @@ object Main extends SafeApp {
         case \/-(randomGenerator) =>
           runContext.outputType match {
             case StdOut => randomGenerator(initialSeed).foreach(println(_))
-            case FileOutput(directory) => {
+            case FileOutput(directory) =>
               randomGenerator(initialSeed).zipWithIndex.foreach { case (output, i) => {
                 val outputStream = new FileOutputStream(new File(directory, s"$i.avro.txt"))
                 output.writeTo(outputStream)
               }
               }
-            }
             case KafkaOutput => {
-              ???
+              val config = ConfigFactory.parseString {
+                s"""
+                   |  bootstrap.servers = "localhost:9092"
+                   |  topic = "samples"
+                   """.stripMargin
+              }
+
+              val client = new SampleSubmitter(config)
+              try {
+                randomGenerator(initialSeed).zipWithIndex.foreach { case (output, i) => {
+                  client.submitSample(i.toString, output.toString)
+                }
+                }
+
+              }
+              catch {
+                case e => println(e)
+              }
+              finally {
+                client.close()
+              }
             }
           }
 

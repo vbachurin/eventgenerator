@@ -17,6 +17,7 @@ object CliParser {
   def getOutputType(outputTypeStr: String, output: Option[String]): String \/ OutputType = outputTypeStr match {
     case "stdout" => \/-(StdOut)
     case "file" => \/-(FileOutput(new File(output.get)))
+    case "kafka" => \/-(KafkaOutput)
     case str => -\/(s"Cannot convert $str")
   }
 
